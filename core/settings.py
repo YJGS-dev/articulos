@@ -34,6 +34,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 LOCAL_APPS = [
+    'apps.departamento',
+    'apps.clase',
+    'apps.familia',
     'apps.articulo'
 ]
 
