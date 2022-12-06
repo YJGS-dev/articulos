@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block style %}
-    <style type="text/css">
-        .hidden {
-            display: none !important;
-        }
-    </style>
+<style type="text/css">
+    .hidden {
+        display: none !important;
+    }
+</style>
 {% endblock %}
 {% block container %}
 <form class="ui form">
@@ -59,33 +59,25 @@
     <div class="row field">
         <label>Clase</label>
         <select id="clase" name="clase" class="ui fluid dropdown">
-            <option value="">State</option>
+            <option value="">Seleccione una opción</option>
         </select>
     </div>
     <div class="row field">
         <label>Familia</label>
         <select id="familia" name="familia" class="ui dropdown">
-            <option value="">State</option>
-            <option value="TN">Tennessee</option>
-            <option value="TX">TEXAS</option>
-            <option value="UT">Utah</option>
-            <option value="VT">Vermont</option>
-            <option value="VA">Virginia</option>
-            <option value="WA">Washington</option>
-            <option value="WV">West Virginia</option>
-            <option value="WI">Wisconsin</option>
-            <option value="WY">Wyoming</option>
+            <option value="">Seleccione una opción</option>
         </select>
     </div>
     <div class="field">
         <div class="ui checkbox" style="display: none;">
-          <input id="descontinuado" name="descontinuado" type="checkbox" tabindex="0">
-          <label>Descontinuado</label>
+            <input id="descontinuado" name="descontinuado" type="checkbox" tabindex="0">
+            <label>Descontinuado</label>
         </div>
     </div>
     <button id="agregar" type="button" class="ui green button hidden">Agregar</button>
     <button id="actualizar" type="button" class="ui green button hidden">Actualizar</button>
     <button id="eliminar" type="button" class="ui red button hidden">Eliminar</button>
+    <button id="cancelar" onclick="javascript:window.location.reload()" type="button" class="ui grey button hidden">Cancelar</button>
     <div class="ui error message"></div>
 </form>
 {% endblock %}
@@ -95,6 +87,7 @@
     window.articuloExist = false;
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     $('select.dropdown').dropdown();
+    const inSku = document.querySelector("#sku");
     const nombre = document.querySelector("#nombre");
     const marca = document.querySelector("#marca");
     const modelo = document.querySelector("#modelo");
@@ -107,16 +100,18 @@
     const btnAgregar = document.querySelector("#agregar");
     const btnActualizar = document.querySelector("#actualizar");
     const btnEliminar = document.querySelector("#eliminar");
+    const btnCancelar = document.querySelector("#cancelar");
+
 
     const getDepartamentos = () => {
         $.ajax({
-            type:'GET',
-            url:`api/departamento/list`,
+            type: 'GET',
+            url: `api/departamento/list`,
             success: (r) => {
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
                 departamento.appendChild(opt);
-                for (item of r?.data){
+                for (item of r?.data) {
                     const opt = document.createElement('option');
                     opt.value = item.id
                     opt.text = item.nombre;
@@ -128,14 +123,14 @@
 
     const getClases = (pk) => {
         $.ajax({
-            type:'GET',
-            url:`api/clase/list/${pk}`,
+            type: 'GET',
+            url: `api/clase/list/${pk}`,
             success: (r) => {
                 clase.innerHTML = '';
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
                 clase.appendChild(opt);
-                for (item of r?.data){
+                for (item of r?.data) {
                     const opt = document.createElement('option');
                     opt.value = item.id
                     opt.text = item.nombre;
@@ -147,14 +142,14 @@
 
     const getFamilias = (pk) => {
         $.ajax({
-            type:'GET',
-            url:`api/familia/list/${pk}`,
+            type: 'GET',
+            url: `api/familia/list/${pk}`,
             success: (r) => {
                 familia.innerHTML = '';
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
                 familia.appendChild(opt);
-                for (item of r?.data){
+                for (item of r?.data) {
                     const opt = document.createElement('option');
                     opt.value = item.id
                     opt.text = item.nombre;
@@ -166,32 +161,22 @@
 
     getDepartamentos();
 
-    
+
     const desabilitarInputs = () => {
-        nombre.readOnly = true;
         nombre.parentElement.parentElement.classList.add("disabled");
-        marca.readOnly = true;
         marca.parentElement.parentElement.classList.add("disabled");
-        modelo.readOnly = true;
         modelo.parentElement.parentElement.classList.add("disabled");
-        cantidad.readOnly = true;
         cantidad.parentElement.parentElement.classList.add("disabled");
-        stock.readOnly = true;
         stock.parentElement.parentElement.classList.add("disabled");
         departamento.parentElement.parentElement.classList.add("disabled");
         clase.parentElement.parentElement.classList.add("disabled");
         familia.parentElement.parentElement.classList.add("disabled");
     }
     const habilitarInputs = () => {
-        nombre.readOnly = false;
         nombre.parentElement.parentElement.classList.remove("disabled");
-        marca.readOnly = false;
         marca.parentElement.parentElement.classList.remove("disabled");
-        modelo.readOnly = false;
         modelo.parentElement.parentElement.classList.remove("disabled");
-        cantidad.readOnly = false;
         cantidad.parentElement.parentElement.classList.remove("disabled");
-        stock.readOnly = false;
         stock.parentElement.parentElement.classList.remove("disabled");
         departamento.parentElement.parentElement.classList.remove("disabled");
         clase.parentElement.parentElement.classList.remove("disabled");
@@ -202,11 +187,11 @@
 
     const buscarArticulo = (sku) => {
         $.ajax({
-            type:'GET',
-            url:`api/articulo/${sku}`,
+            type: 'GET',
+            url: `api/articulo/${sku}`,
             success: (r) => {
-                console.log(r);
-                // Actualizar 
+                // Actualizar
+                inSku.parentElement.parentElement.classList.add("disabled");
                 nombre.value = r?.data[0].nombre;
                 marca.value = r?.data[0].marca;
                 modelo.value = r?.data[0].modelo;
@@ -214,19 +199,21 @@
                 stock.value = r?.data[0].stock;
                 departamento.value = r?.data[0].departamento_id;
                 $("#departamento").trigger("change");
-                setTimeout(()=>{
+                setTimeout(() => {
                     clase.value = r?.data[0].clase_id;
                     $("#clase").trigger("change");
-                },200);
-                setTimeout(()=>{
+                }, 200);
+                setTimeout(() => {
                     familia.value = r?.data[0].familia_id;
                     $("#familia").trigger("change");
-                },400);
+                }, 400);
                 habilitarInputs();
                 btnActualizar.classList.remove("hidden");
                 btnEliminar.classList.remove("hidden");
+                btnCancelar.classList.remove("hidden");
                 btnAgregar.classList.add("hidden");
                 descontinuado.parentElement.style.display = null;
+                descontinuado.checked = r?.data[0].descontinuado === 1 ? true:false;
             },
             error: (e) => {
                 if (e.status === 404) {
@@ -236,21 +223,22 @@
                     familia.parentElement.parentElement.classList.add("disabled");
                     btnActualizar.classList.add("hidden");
                     btnEliminar.classList.add("hidden");
+                    btnCancelar.classList.add("hidden");
                     btnAgregar.classList.remove("hidden");
                 }
             }
         });
     }
-    
+
     $(".buscar").on("click", function (e) {
         const sku = document.querySelector("#sku").value;
-        if(articuloForm.element("#sku")) {
+        if (articuloForm.element("#sku")) {
             buscarArticulo(sku);
         }
     });
 
     $("#departamento").on("change", function () {
-        if(departamento.value){
+        if (departamento.value) {
             getClases(departamento.value);
             clase.parentElement.parentElement.classList.remove("disabled");
             familia.parentElement.parentElement.classList.add("disabled");
@@ -259,20 +247,24 @@
     });
 
     $("#clase").on("change", function () {
-        if(clase.value){
+        if (clase.value) {
             familia.parentElement.parentElement.classList.remove("disabled");
             getFamilias(clase.value);
         }
     });
 
     $("#agregar").on("click", function () {
-        if($(".ui.form").valid()) {
+        if ($(".ui.form").valid()) {
             $.ajax({
                 type: 'post',
-                url:'api/articulo/create',
+                url: 'api/articulo/create',
                 data: $('.ui.form').serialize(),
                 success: (r) => {
-                    console.log(r);
+                    notification.success(r?.message);
+                    btnAgregar.classList.add("disabled");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500)
                 },
                 error: (e) => {
                     console.log(e);
@@ -284,15 +276,18 @@
     $("#actualizar").on("click", function () {
         let data = $('.ui.form').serializeArray();
         const checked = document.querySelector("#descontinuado").checked;
-        if (checked) data.push({name: "descontinuado", value: 1});
-        else data.push({name: "descontinuado", value: 0});
-        if($(".ui.form").valid()) {
+        if (checked) data.push({ name: "descontinuado", value: 1 });
+        else data.push({ name: "descontinuado", value: 0 });
+        if ($(".ui.form").valid()) {
             $.ajax({
                 type: 'put',
                 url: 'api/articulo/update',
                 data: data,
                 success: (r) => {
-                    console.log(r);
+                    notification.success(r?.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 },
                 error: (e) => {
                     console.log(e);
@@ -302,102 +297,119 @@
     });
 
     $("#eliminar").on("click", function () {
-        $.ajax({
-            type: 'delete',
-            url: `api/articulo/${sku.value}/delete`,
-            success: (r) => {
-                console.log(r);
-            },
-            error: (e) => {
-                console.log(e);
+        Swal.fire({
+            title: `¿Esta seguro de eliminar el articulo, ${nombre.value}?`,
+            text: "No se podra revertir los cambios!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#21ba45',
+            cancelButtonColor: '#db2828',
+            confirmButtonText: 'Si, eliminar!',
+            cancelButtonText: 'Cancelar'
+        }).then((r) => {
+            if (r.isConfirmed) {
+                $.ajax({
+                    type: 'delete',
+                    url: `api/articulo/${sku.value}/delete`,
+                    success: (r) => {
+                        notification.success(r?.message);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    },
+                    error: (e) => {
+                        notification.error(e);
+                    }
+                });
             }
-        });
+        })
     });
 
+
     window.articuloForm = $(".ui.form")
-    .validate({
-        ignore:[],
-        errorElement: "span",
-        rules: {
-            sku: {
-                required: true,
-                digits: true
+        .validate({
+            ignore: [],
+            errorElement: "span",
+            rules: {
+                sku: {
+                    required: true,
+                    digits: true
+                },
+                nombre: {
+                    required: true,
+                },
+                marca: {
+                    required: true,
+                },
+                modelo: {
+                    required: true,
+                },
+                cantidad: {
+                    required: true,
+                    digits: true,
+                    maxlength: 9
+                },
+                stock: {
+                    required: true,
+                    digits: true,
+                    maxlength: 9
+                },
+                departamento: {
+                    required: true,
+                },
+                clase: {
+                    required: true,
+                },
+                familia: {
+                    required: true,
+                }
             },
-            nombre: {
-                required: true,
+            messages: {
+                sku: {
+                    required: "Este campo es requerido",
+                    digits: "Sólo se aceptan dígitos"
+                },
+                nombre: {
+                    required: "Este campo es requerido"
+                },
+                marca: {
+                    required: "Este campo es requerido",
+                },
+                modelo: {
+                    required: "Este campo es requerido",
+                },
+                cantidad: {
+                    required: "Este campo es requerido",
+                    digits: "Sólo se aceptan dígitos",
+                    number: "Ingresa un numero valido",
+                    maxlength: "Maximo 9 digitos"
+                },
+                stock: {
+                    required: "Este campo es requerido",
+                    digits: "Sólo se aceptan dígitos",
+                    number: "Ingresa un numero valido",
+                    maxlength: "Maximo 9 digitos"
+                },
+                departamento: {
+                    required: "Seleccione una opción"
+                },
+                clase: {
+                    required: "Seleccione una opción"
+                },
+                familia: {
+                    required: "Seleccione una opción"
+                },
             },
-            marca: {
-                required: true,
+            errorPlacement: function (error, element) {
+                error.addClass("ui basic red pointing prompt label transition");
+                error.insertAfter(element.parent());
             },
-            modelo: {
-                required: true,
+            highlight: function (element, errorClass, validClass) {
+                $(element).parents(".row").addClass(errorClass);
             },
-            cantidad: {
-                required: true,
-                digits: true,
-                maxlength: 9
-            },
-            stock: {
-                required: true,
-                digits: true,
-                maxlength: 9
-            },
-            departamento: {
-                required: true,
-            },
-            clase: {
-                required: true,
-            },
-            familia: {
-                required: true,
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).parents(".row").removeClass(errorClass);
             }
-        },
-        messages: {
-            sku: { 
-                required: "Este campo es requerido",
-                digits: "Sólo se aceptan dígitos"
-            },
-            nombre: {
-                required: "Este campo es requerido"
-            },
-            marca: {
-                required: "Este campo es requerido",
-            },
-            modelo: {
-                required: "Este campo es requerido",
-            },
-            cantidad: {
-                required: "Este campo es requerido",
-                digits: "Sólo se aceptan dígitos",
-                number: "Ingresa un numero valido",
-                maxlength: "Maximo 9 digitos"
-            },
-            stock: {
-                required: "Este campo es requerido",
-                digits: "Sólo se aceptan dígitos",
-                number: "Ingresa un numero valido",
-                maxlength: "Maximo 9 digitos"
-            },
-            departamento: {
-                required: "Seleccione una opción"
-            },
-            clase: {
-                required: "Seleccione una opción"
-            },
-            familia: {
-                required: "Seleccione una opción"
-            },
-        },
-        errorPlacement: function (error, element) {
-            error.addClass("ui basic red pointing prompt label transition");
-            error.insertAfter(element.parent());
-        },
-        highlight: function (element, errorClass, validClass) {
-            $(element).parents(".row").addClass(errorClass);
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).parents(".row").removeClass(errorClass);
-        }
-    });
+        });
 </script>
 {% endblock %}

@@ -41,7 +41,7 @@ def api_crear_articulo_view(request):
                 %s::bigint)
             """, values)
             articulo = cursor.fetchone()
-        return Response({'message': 'data'})
+        return Response({'message': 'Articulo agregado exitosamente'})
 
 @api_view(['PUT', ])
 def api_update_articulo_view(request):
@@ -73,7 +73,7 @@ def api_update_articulo_view(request):
                 %s::smallint)
             """, values)
             articulo = cursor.fetchone()
-        return Response({'message': 'data'})
+        return Response({'message': 'Articulo actualizado exitosamente'})
 
 @api_view(['DELETE', ])
 def api_eliminar_articulo_view(request, sku):
@@ -81,6 +81,6 @@ def api_eliminar_articulo_view(request, sku):
         with connection.cursor() as cursor:
             articulo = cursor.execute("""SELECT delete_articulo(%s::smallint)""", [sku])
             articulo = cursor.fetchone()
-        return Response({'message': 'data'})
+        return Response({'message': 'Articulo eliminado'})
 
 
