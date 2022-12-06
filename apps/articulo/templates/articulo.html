@@ -78,7 +78,8 @@
     <button id="agregar" type="button" class="ui green button hidden">Agregar</button>
     <button id="actualizar" type="button" class="ui green button hidden">Actualizar</button>
     <button id="eliminar" type="button" class="ui red button hidden">Eliminar</button>
-    <button id="cancelar" onclick="javascript:window.location.reload()" type="button" class="ui grey button hidden">Cancelar</button>
+    <button id="cancelar" onclick="javascript:window.location.reload()" type="button"
+        class="ui grey button hidden">Cancelar</button>
     <div class="ui error message"></div>
 </form>
 {% endblock %}
@@ -122,49 +123,8 @@
             }
         });
     }
-
-    const getClases = (pk) => {
-        $.ajax({
-            type: 'GET',
-            url: `api/clase/list/${pk}`,
-            success: (r) => {
-                clase.innerHTML = '';
-                const opt = document.createElement('option');
-                opt.text = "Seleccione una opción";
-                opt.value = "";
-                clase.appendChild(opt);
-                for (item of r?.data) {
-                    const opt = document.createElement('option');
-                    opt.value = item.id
-                    opt.text = item.nombre;
-                    clase.appendChild(opt);
-                }
-            }
-        });
-    }
-
-    const getFamilias = (pk) => {
-        $.ajax({
-            type: 'GET',
-            url: `api/familia/list/${pk}`,
-            success: (r) => {
-                familia.innerHTML = '';
-                const opt = document.createElement('option');
-                opt.text = "Seleccione una opción";
-                opt.value = "";
-                familia.appendChild(opt);
-                for (item of r?.data) {
-                    const opt = document.createElement('option');
-                    opt.value = item.id
-                    opt.text = item.nombre;
-                    familia.appendChild(opt);
-                }
-            }
-        });
-    }
-
+    
     getDepartamentos();
-
 
     const desabilitarInputs = () => {
         nombre.parentElement.parentElement.classList.add("disabled");
@@ -202,22 +162,14 @@
                 cantidad.value = r?.data[0].cantidad;
                 stock.value = r?.data[0].stock;
                 departamento.value = r?.data[0].departamento_id;
-                $("#departamento").trigger("change");
-                setTimeout(() => {
-                    clase.value = r?.data[0].clase_id;
-                    $("#clase").trigger("change");
-                }, 200);
-                setTimeout(() => {
-                    familia.value = r?.data[0].familia_id;
-                    $("#familia").trigger("change");
-                }, 400);
+                $("#departamento").trigger("change", [{ clase: r?.data[0].clase_id, familia: r?.data[0].familia_id }]);
                 habilitarInputs();
                 btnActualizar.classList.remove("hidden");
                 btnEliminar.classList.remove("hidden");
                 btnCancelar.classList.remove("hidden");
                 btnAgregar.classList.add("hidden");
                 descontinuado.parentElement.style.display = null;
-                descontinuado.checked = r?.data[0].descontinuado === 1 ? true:false;
+                descontinuado.checked = r?.data[0].descontinuado === 1 ? true : false;
             },
             error: (e) => {
                 if (e.status === 404) {
@@ -243,19 +195,68 @@
         }
     });
 
-    $("#departamento").on("change", function () {
+    $("#departamento").on("change", function (e, data) {
         if (departamento.value) {
-            getClases(departamento.value);
+            $.ajax({
+                type: 'GET',
+                url: `api/clase/list/${departamento.value}`,
+                success: (r) => {
+                    clase.innerHTML = '';
+                    const opt = document.createElement('option');
+                    opt.text = "Seleccione una opción";
+                    opt.value = "";
+                    clase.appendChild(opt);
+                    for (item of r?.data) {
+                        const opt = document.createElement('option');
+                        opt.value = item.id
+                        opt.text = item.nombre;
+                        clase.appendChild(opt);
+                    }
+                    if (data?.clase) {
+                        clase.value = data.clase;
+                        $("#clase").trigger('change', [{ familia: data.familia }]);
+                    }
+                }
+            });
             clase.parentElement.classList.remove("disabled");
             familia.parentElement.classList.add("disabled");
             familia.innerHTML = '';
+        } else {
+            clase.innerHTML = '';
+            familia.innerHTML = '';
+            familia.parentElement.classList.add("disabled");
+            clase.parentElement.classList.add("disabled");
         }
     });
 
-    $("#clase").on("change", function () {
+    $("#clase").on("change", function (e, data) {
         if (clase.value) {
             familia.parentElement.classList.remove("disabled");
-            getFamilias(clase.value);
+            $.ajax({
+                type: 'GET',
+                url: `api/familia/list/${clase.value}`,
+                success: (r) => {
+                    familia.innerHTML = '';
+                    const opt = document.createElement('option');
+                    opt.text = "Seleccione una opción";
+                    opt.value = "";
+                    familia.appendChild(opt);
+                    for (item of r?.data) {
+                        const opt = document.createElement('option');
+                        opt.value = item.id
+                        opt.text = item.nombre;
+                        familia.appendChild(opt);
+                    }
+                    if (data?.familia) {
+                        familia.value = data.familia;
+                        $("#familia").trigger('change');
+                    }
+                }
+            });
+
+        } else {
+            familia.innerHTML = '';
+            familia.parentElement.classList.add("disabled");
         }
     });
 
@@ -332,14 +333,14 @@
     });
 
     $("#stock").on("blur", function () {
-        articuloForm.element("#cantidad"); 
+        articuloForm.element("#cantidad");
     });
 
     // Validators
 
-    jQuery.validator.addMethod("cantidad_valido", function(value, element) {
-      return !(parseInt(value) > parseInt(stock.value));
-   }, "La cantidad no debe ser mayor al stock");
+    jQuery.validator.addMethod("cantidad_valido", function (value, element) {
+        return !(parseInt(value) > parseInt(stock.value));
+    }, "La cantidad no debe ser mayor al stock");
 
     window.articuloForm = $(".ui.form")
         .validate({
