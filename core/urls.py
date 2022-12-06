@@ -23,4 +23,7 @@ urlpatterns = [
 
     #rest_framework
     path('api/articulo/', include('apps.articulo.api.urls','articulo_api')),
+    path('api/departamento/', include('apps.departamento.api.urls','departamento_api')),
+    path('api/clase/', include('apps.clase.api.urls','clase_api')),
+    path('api/familia/', include('apps.familia.api.urls','familia_api')),
 ]
