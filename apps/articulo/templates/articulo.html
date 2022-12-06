@@ -9,7 +9,7 @@
 {% block container %}
 <form class="ui form">
     {% csrf_token %}
-    <h3 class="ui dividing header">Articulo</h3>
+    <h3 class="ui dividing header">Artículo</h3>
     <div class="row field">
         <label>Sku</label>
         <div class="ui icon input">
@@ -298,13 +298,13 @@
 
     $("#eliminar").on("click", function () {
         Swal.fire({
-            title: `¿Esta seguro de eliminar el articulo, ${nombre.value}?`,
-            text: "No se podra revertir los cambios!",
+            title: `¿Está seguro de eliminar el artículo, ${nombre.value}?`,
+            text: "No se podrá revertir los cambios!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#21ba45',
             cancelButtonColor: '#db2828',
-            confirmButtonText: 'Si, eliminar!',
+            confirmButtonText: 'Sí, eliminar!',
             cancelButtonText: 'Cancelar'
         }).then((r) => {
             if (r.isConfirmed) {
@@ -325,6 +325,15 @@
         })
     });
 
+    $("#stock").on("blur", function () {
+        articuloForm.element("#cantidad"); 
+    });
+
+    // Validators
+
+    jQuery.validator.addMethod("cantidad_valido", function(value, element) {
+      return !(parseInt(value) > parseInt(stock.value));
+   }, "La cantidad no debe ser mayor al stock");
 
     window.articuloForm = $(".ui.form")
         .validate({
@@ -347,7 +356,8 @@
                 cantidad: {
                     required: true,
                     digits: true,
-                    maxlength: 9
+                    maxlength: 9,
+                    cantidad_valido: true
                 },
                 stock: {
                     required: true,
@@ -381,14 +391,14 @@
                 cantidad: {
                     required: "Este campo es requerido",
                     digits: "Sólo se aceptan dígitos",
-                    number: "Ingresa un numero valido",
-                    maxlength: "Maximo 9 digitos"
+                    number: "Ingresa un número válido",
+                    maxlength: "Máximo 9 dígitos"
                 },
                 stock: {
                     required: "Este campo es requerido",
                     digits: "Sólo se aceptan dígitos",
-                    number: "Ingresa un numero valido",
-                    maxlength: "Maximo 9 digitos"
+                    number: "Ingresa un número válido",
+                    maxlength: "Máximo 9 dígitos"
                 },
                 departamento: {
                     required: "Seleccione una opción"
