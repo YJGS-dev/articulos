@@ -108,6 +108,7 @@
             type: 'GET',
             url: `api/departamento/list`,
             success: (r) => {
+                departamento.innerHTML = '';
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
                 opt.value = "";
@@ -171,9 +172,9 @@
         modelo.parentElement.parentElement.classList.add("disabled");
         cantidad.parentElement.parentElement.classList.add("disabled");
         stock.parentElement.parentElement.classList.add("disabled");
-        departamento.parentElement.parentElement.classList.add("disabled");
-        clase.parentElement.parentElement.classList.add("disabled");
-        familia.parentElement.parentElement.classList.add("disabled");
+        departamento.parentElement.classList.add("disabled");
+        clase.parentElement.classList.add("disabled");
+        familia.parentElement.classList.add("disabled");
     }
     const habilitarInputs = () => {
         nombre.parentElement.parentElement.classList.remove("disabled");
@@ -181,9 +182,9 @@
         modelo.parentElement.parentElement.classList.remove("disabled");
         cantidad.parentElement.parentElement.classList.remove("disabled");
         stock.parentElement.parentElement.classList.remove("disabled");
-        departamento.parentElement.parentElement.classList.remove("disabled");
-        clase.parentElement.parentElement.classList.remove("disabled");
-        familia.parentElement.parentElement.classList.remove("disabled");
+        departamento.parentElement.classList.remove("disabled");
+        clase.parentElement.classList.remove("disabled");
+        familia.parentElement.classList.remove("disabled");
     }
 
     desabilitarInputs();
@@ -222,8 +223,8 @@
                 if (e.status === 404) {
                     // Agregar
                     habilitarInputs();
-                    clase.parentElement.parentElement.classList.add("disabled");
-                    familia.parentElement.parentElement.classList.add("disabled");
+                    clase.parentElement.classList.add("disabled");
+                    familia.parentElement.classList.add("disabled");
                     btnActualizar.classList.add("hidden");
                     btnEliminar.classList.add("hidden");
                     btnCancelar.classList.add("hidden");
@@ -245,15 +246,15 @@
     $("#departamento").on("change", function () {
         if (departamento.value) {
             getClases(departamento.value);
-            clase.parentElement.parentElement.classList.remove("disabled");
-            familia.parentElement.parentElement.classList.add("disabled");
+            clase.parentElement.classList.remove("disabled");
+            familia.parentElement.classList.add("disabled");
             familia.innerHTML = '';
         }
     });
 
     $("#clase").on("change", function () {
         if (clase.value) {
-            familia.parentElement.parentElement.classList.remove("disabled");
+            familia.parentElement.classList.remove("disabled");
             getFamilias(clase.value);
         }
     });
