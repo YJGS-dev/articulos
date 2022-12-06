@@ -12,7 +12,7 @@ def api_detalle_articulo_view(request, sku):
             articulo = cursor.fetchone()
             if not articulo[0]:
                 return Response({'message': 'Not Found'}, status = status.HTTP_404_NOT_FOUND)
-        return Response({'message': 'success','data':articulo[0]})
+        return Response({'message': 'success','data':articulo[0]}, status = status.HTTP_200_OK)
 
 @api_view(['POST', ])
 def api_crear_articulo_view(request):
@@ -44,8 +44,8 @@ def api_crear_articulo_view(request):
                 %s::bigint, 
                 %s::bigint)
             """, values)
-            articulo = cursor.fetchone()
-        return Response({'message': 'Artículo agregado exitosamente'})
+            cursor.fetchone()
+        return Response({'message': 'Artículo agregado exitosamente'}, status = status.HTTP_200_OK)
 
 @api_view(['PUT', ])
 def api_update_articulo_view(request):
@@ -64,7 +64,7 @@ def api_update_articulo_view(request):
         ]
         print(values)
         with connection.cursor() as cursor:
-            articulo = cursor.execute("""SELECT update_articulo(
+            cursor.execute("""SELECT update_articulo(
                 %s::smallint, 
                 %s::varchar, 
                 %s::varchar, 
@@ -76,15 +76,15 @@ def api_update_articulo_view(request):
                 %s::bigint, 
                 %s::smallint)
             """, values)
-            articulo = cursor.fetchone()
-        return Response({'message': 'Artículo actualizado exitosamente'})
+            cursor.fetchone()
+        return Response({'message': 'Artículo actualizado exitosamente'}, status = status.HTTP_200_OK)
 
 @api_view(['DELETE', ])
 def api_eliminar_articulo_view(request, sku):
     if request.method == 'DELETE':
         with connection.cursor() as cursor:
-            articulo = cursor.execute("""SELECT delete_articulo(%s::smallint)""", [sku])
-            articulo = cursor.fetchone()
-        return Response({'message': 'Artículo eliminado'})
+            cursor.execute("""SELECT delete_articulo(%s::smallint)""", [sku])
+            cursor.fetchone()
+        return Response({'message': 'Artículo eliminado'}, status = status.HTTP_200_OK)
 
 
