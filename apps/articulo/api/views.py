@@ -8,16 +8,20 @@ from django.db import connection
 def api_detalle_articulo_view(request, sku):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-            query = cursor.execute("SELECT get_articulo(%s)", [sku])
-            query = cursor.fetchone()
-            if not query[0]:
-                return Response({'mesagge': 'Not Found'}, status = status.HTTP_404_NOT_FOUND)
-        return Response({'message': 'success','data':query[0]})
+            cursor.execute("SELECT get_articulo(%s)", [sku])
+            articulo = cursor.fetchone()
+            if not articulo[0]:
+                return Response({'message': 'Not Found'}, status = status.HTTP_404_NOT_FOUND)
+        return Response({'message': 'success','data':articulo[0]})
 
 @api_view(['POST', ])
 def api_crear_articulo_view(request):
     if request.method == 'POST':
         with connection.cursor() as cursor:
+            cursor.execute("SELECT get_articulo(%s)", [request.POST.get("sku")])
+            articulo = cursor.fetchone()
+            if articulo[0]:
+                return Response({'message': 'Ya existe un artículo con ese sku'}, status = status.HTTP_400_BAD_REQUEST)
             values = [
                 request.POST.get("sku"),
                 request.POST.get("nombre"),
@@ -29,7 +33,7 @@ def api_crear_articulo_view(request):
                 request.POST.get("clase"),
                 request.POST.get("familia")
             ]
-            articulo = cursor.execute("""SELECT create_articulo(
+            cursor.execute("""SELECT create_articulo(
                 %s::smallint, 
                 %s::varchar, 
                 %s::varchar, 

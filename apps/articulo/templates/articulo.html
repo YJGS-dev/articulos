@@ -54,6 +54,7 @@
     <div class="row field">
         <label>Departamento</label>
         <select id="departamento" name="departamento" class="ui fluid dropdown">
+            <option value="">Seleccione una opción</option>
         </select>
     </div>
     <div class="row field">
@@ -110,6 +111,7 @@
             success: (r) => {
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
+                opt.value = "";
                 departamento.appendChild(opt);
                 for (item of r?.data) {
                     const opt = document.createElement('option');
@@ -129,6 +131,7 @@
                 clase.innerHTML = '';
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
+                opt.value = "";
                 clase.appendChild(opt);
                 for (item of r?.data) {
                     const opt = document.createElement('option');
@@ -148,6 +151,7 @@
                 familia.innerHTML = '';
                 const opt = document.createElement('option');
                 opt.text = "Seleccione una opción";
+                opt.value = "";
                 familia.appendChild(opt);
                 for (item of r?.data) {
                     const opt = document.createElement('option');
@@ -230,6 +234,8 @@
         });
     }
 
+    // Eventos 
+
     $(".buscar").on("click", function (e) {
         const sku = document.querySelector("#sku").value;
         if (articuloForm.element("#sku")) {
@@ -267,7 +273,7 @@
                     }, 1500)
                 },
                 error: (e) => {
-                    console.log(e);
+                    notification.error(e?.responseJSON.message);
                 }
             });
         }
@@ -290,7 +296,7 @@
                     }, 1500);
                 },
                 error: (e) => {
-                    console.log(e);
+                    notification.error(e?.responseJSON.message);
                 }
             });
         }
@@ -318,7 +324,7 @@
                         }, 1500);
                     },
                     error: (e) => {
-                        notification.error(e);
+                        notification.error(e?.responseJSON.message);
                     }
                 });
             }
